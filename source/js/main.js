@@ -11,26 +11,13 @@ var temp;
 function main() {
     htmlCanvas = document.getElementById("myCanvas");
     ctx = htmlCanvas.getContext('2d');
+    vectors = [];
     win_l = window.innerWidth;
     win_h = window.innerHeight;
-    size = win_h;
-    vectors = [];
-
-    if(win_l < win_h){
-        size = win_l;
-    }
+    size = Math.min(win_h, win_l);
 
     ctx.canvas.width  = size;
     ctx.canvas.height = size;
-    //...drawing code...
-    
-    var centerX = size / 2;
-    var centerY = size / 2;
-    var radius = size / 60;
-
-    temp = new Circle(centerX, centerY, radius, 'green', 1);
-    temp.draw();
-    vectors.push(temp);
 
     htmlCanvas.addEventListener("mousedown",  function(ev) {
         if (ev.which === 1) {
@@ -41,31 +28,32 @@ function main() {
 
 function ctxEvent(){
     var coords = htmlCanvas.relMouseCoords(event);
-    var radius = (size / 60);
+    var radius = size / 60;
     var removed = false;
-    console.log(coords.x);
-    console.log(coords.y);
-    for(var i = 0; i < vectors.length; i++){
-        var ph = vectors[i];
-        if(ph != null && ph.isClicked(coords.x, coords.y)){
-            ph.clearRegion();
-            vectors[i] = null;
-            removed = true;
-        }
-    }
 
-    radius = size / 60;
+    if(coords.x > radius && coords.x < size - radius){
+        if(coords.y > radius && coords.y < size - radius){
+            for(var i = 0; i < vectors.length; i++){
+                var ph = vectors[i];
+                if(ph != null && ph.isClicked(coords.x, coords.y)){
+                    ph.clearRegion();
+                    vectors[i] = null;
+                    removed = true;
+                }
+            }
 
-    if(removed == false){
-        temp = new Circle(coords.x, coords.y, radius, 'green', 1);
-        if(!temp.isCollision(vectors)){
-            temp.draw();
-            vectors.push(temp);
+            if(removed == false){
+                temp = new Node(coords.x, coords.y, radius, 'green', 1);
+                if(!temp.isCollision(vectors)){
+                    temp.draw();
+                    vectors.push(temp);
+                }
+            }
         }
     }
 }
 
-function Circle(x, y, r, fill, stroke) {
+function Node(x, y, r, fill, stroke) {
     this.startingAngle = 0;
     this.endAngle = 2 * Math.PI;
     this.x = x;
