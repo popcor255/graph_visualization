@@ -34,7 +34,7 @@ function ctxEvent(){
             for(var i = 0; i < vectors.length; i++){
                 temp = vectors[i];
                 if(temp != null && temp.isClicked(coords.x, coords.y)){
-                    ph.clearRegion();
+                    temp.clearRegion();
                     vectors[i] = null;
                     removed = true;
                 }
@@ -48,6 +48,21 @@ function ctxEvent(){
                 }
             }
         }
+    }
+}
+
+function Edges(head, tail, weight, bi_dir){
+    this.head = head;
+    this.tail = tail;
+    this.weight = weight;
+    this.bi_dir = bi_dir;
+
+    this.draw = function(){
+        ctx.beginPath();
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.moveTo(head.x, head.y);
+        ctx.lineTo(tail.x, tail.y);
+        ctx.stroke();
     }
 }
 
