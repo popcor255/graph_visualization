@@ -5,9 +5,6 @@ var win_h;
 var size;
 var vectors;
 
-//testing var
-var temp;
-
 function main() {
     htmlCanvas = document.getElementById("myCanvas");
     ctx = htmlCanvas.getContext('2d');
@@ -30,12 +27,13 @@ function ctxEvent(){
     var coords = htmlCanvas.relMouseCoords(event);
     var radius = size / 60;
     var removed = false;
+    var temp = null;
 
     if(coords.x > radius && coords.x < size - radius){
         if(coords.y > radius && coords.y < size - radius){
             for(var i = 0; i < vectors.length; i++){
-                var ph = vectors[i];
-                if(ph != null && ph.isClicked(coords.x, coords.y)){
+                temp = vectors[i];
+                if(temp != null && temp.isClicked(coords.x, coords.y)){
                     ph.clearRegion();
                     vectors[i] = null;
                     removed = true;
