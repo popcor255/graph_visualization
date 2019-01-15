@@ -29,13 +29,24 @@ function ctxEvent(){
     var removed = false;
     var temp = null;
 
+    nodeEventHandler(coords, radius, removed, temp);
+    
+}
+
+function nodeEventHandler(coords, radius, removed, temp){
+
+    //The conditions go as follows:
+    //1) The circle must fit in the canvas (lines 42-43)
+    //2) The circle must not overlap (lines 47)
+    //3) If the circle is already present do not add, but remove
+
     if(coords.x > radius && coords.x < size - radius){
         if(coords.y > radius && coords.y < size - radius){
             for(var i = 0; i < vectors.length; i++){
                 temp = vectors[i];
                 if(temp != null && temp.isClicked(coords.x, coords.y)){
                     temp.clearRegion();
-                    vectors[i] = null;
+                    vectors.splice(i, 1);
                     removed = true;
                 }
             }
@@ -43,19 +54,43 @@ function ctxEvent(){
             if(removed == false){
                 temp = new Node(coords.x, coords.y, radius, 'green', 1);
                 if(!temp.isCollision(vectors)){
-                    temp.draw();
                     vectors.push(temp);
                 }
             }
         }
     }
+
+    //redraw nodes as follows
+    //if the head your blue
+    //if the tail your red
+    //else your green
+
+    if(vectors.length > 0){
+        temp = vectors[0];
+        temp.clearRegion();
+        vectors[0] = new Node(temp.x, temp.y, temp.r, 'blue', 1);
+        vectors[0].draw();
+    }
+
+    for(var i = 1; i < vectors.length - 1; i++){
+        temp = vectors[i];
+        vectors[i].clearRegion();
+        vectors[i] = new Node(temp.x, temp.y, temp.r, 'green', 1);
+        vectors[i].draw();
+    }
+
+    if(vectors.length > 1){
+        temp = vectors[vectors.length - 1];
+        temp.clearRegion();
+        vectors[vectors.length - 1] = new Node(temp.x, temp.y, temp.r, 'red', 1);
+        vectors[vectors.length - 1].draw();
+    }
+    
 }
 
-function Edge(head, tail, weight, bi_dir){
+function Edge(head, tail){
     this.head = head;
     this.tail = tail;
-    this.weight = weight;
-    this.bi_dir = bi_dir;
 
     this.draw = function(){
         ctx.beginPath();
@@ -144,3 +179,8 @@ function relMouseCoords(event){
     return {x:canvasX, y:canvasY}
 }
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
+
+CanvasRenderingContext2D.prototype.clear = function(){
+    ctx.clearRect(0,0,size,size);
+    vectors = [];
+}
