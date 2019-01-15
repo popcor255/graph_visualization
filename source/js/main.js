@@ -43,9 +43,7 @@ function ctxEvent(){
     var coords = htmlCanvas.relMouseCoords(event);
     console.log(coords.x);
     console.log(coords.y);
-    if(temp.isClicked(coords.x, coords.y)){
-        
-    }
+    console.log(temp.isClicked(coords.x, coords.y));
 }
 
 function Circle(x, y, r, fill, stroke) {
