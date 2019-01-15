@@ -63,6 +63,7 @@ function Edges(head, tail, weight, bi_dir){
         ctx.moveTo(head.x, head.y);
         ctx.lineTo(tail.x, tail.y);
         ctx.stroke();
+        ctx.globalCompositeOperation = 'source-over';
     }
 }
 
