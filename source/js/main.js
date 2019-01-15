@@ -21,6 +21,11 @@ function main() {
             ctxEvent();
         }
     }, false);
+
+
+    htmlCanvas.addEventListener('wheel', function(ev) {
+        scrollEvent(ev.deltaY);
+    });
 }
 
 function ctxEvent(){
@@ -31,6 +36,15 @@ function ctxEvent(){
 
     nodeEventHandler(coords, radius, removed, temp);
     
+}
+
+function scrollEvent(y){
+    for(var i = 0; i < vectors.length; i++){
+        temp = vectors[i];
+        vectors[i].clearRegion();
+        vectors[i] = new Node(temp.x, temp.y, temp.r, 'white', 1);
+        vectors[i].draw();
+    }
 }
 
 function nodeEventHandler(coords, radius, removed, temp){
@@ -52,7 +66,7 @@ function nodeEventHandler(coords, radius, removed, temp){
             }
 
             if(removed == false){
-                temp = new Node(coords.x, coords.y, radius, 'green', 1);
+                temp = new Node(coords.x, coords.y, radius, 'white', 1);
                 if(!temp.isCollision(vectors)){
                     vectors.push(temp);
                 }
@@ -75,7 +89,7 @@ function nodeEventHandler(coords, radius, removed, temp){
     for(var i = 1; i < vectors.length - 1; i++){
         temp = vectors[i];
         vectors[i].clearRegion();
-        vectors[i] = new Node(temp.x, temp.y, temp.r, 'green', 1);
+        vectors[i] = new Node(temp.x, temp.y, temp.r, 'white', 1);
         vectors[i].draw();
     }
 
