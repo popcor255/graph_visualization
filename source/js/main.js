@@ -41,9 +41,26 @@ function main() {
 
 function ctxEvent(){
     var coords = htmlCanvas.relMouseCoords(event);
+    var radius = (size / 60);
+    
     console.log(coords.x);
     console.log(coords.y);
-    console.log(temp.isClicked(coords.x, coords.y));
+
+    for(var i = 0; i < vectors.length; i++){
+        var ph = vectors[i];
+        if(ph != null && ph.isClicked(coords.x, coords.y)){
+            ph.clearRegion();
+            vectors[i] = null;
+        }
+    }
+
+    radius = size / 60;
+
+    if(removed == false){
+        temp = new Circle(coords.x, coords.y, radius, 'green', 1);
+        temp.draw();
+        vectors.push(temp);
+    }
 }
 
 function Circle(x, y, r, fill, stroke) {
@@ -52,6 +69,7 @@ function Circle(x, y, r, fill, stroke) {
     this.x = x;
     this.y = y;
     this.r = r;
+    this.region = r * 2.2;
 
     this.fill = fill;
     this.stroke = stroke;
@@ -64,6 +82,10 @@ function Circle(x, y, r, fill, stroke) {
         ctx.fill();
         ctx.strokeStyle = this.stroke;
         ctx.stroke();
+    }
+
+    this.clearRegion = function() {
+        ctx.clearRect(this.x - (this.region / 2), this.y - (this.region / 2), this.region, this.region);
     }
 
     this.isClicked = function (in_x, in_y) {
