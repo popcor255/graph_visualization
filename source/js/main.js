@@ -51,7 +51,7 @@ function ctxEvent(){
     }
 }
 
-function Edges(head, tail, weight, bi_dir){
+function Edge(head, tail, weight, bi_dir){
     this.head = head;
     this.tail = tail;
     this.weight = weight;
