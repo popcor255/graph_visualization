@@ -3,6 +3,7 @@ var ctx;
 var win_l;
 var win_h;
 var size;
+var radius;
 var vectors;
 
 function main() {
@@ -12,6 +13,7 @@ function main() {
     win_l = window.innerWidth;
     win_h = window.innerHeight;
     size = Math.min(win_h, win_l);
+    radius = size / 60;
 
     ctx.canvas.width  = size;
     ctx.canvas.height = size;
@@ -24,13 +26,12 @@ function main() {
 
 
     htmlCanvas.addEventListener('wheel', function(ev) {
-        scrollEvent(ev.deltaY);
+        scrollEvent(ev);
     });
 }
 
 function ctxEvent(){
     var coords = htmlCanvas.relMouseCoords(event);
-    var radius = size / 60;
     var removed = false;
     var temp = null;
 
@@ -38,11 +39,28 @@ function ctxEvent(){
     
 }
 
-function scrollEvent(y){
+function scrollEvent(ev){
+    var scroll = 0;
+    var y = ev.deltaY;
+
+    if(vectors.length > 0){
+        if (y < 0 && radius >= (size / 60)) {
+            console.log("down");
+            scroll = -2;   
+        }
+
+        if (y > 0 && radius <= (size / 60)) {
+            console.log("up");
+            scroll = 2;   
+        }
+    }
+
+    radius += scroll;
+
     for(var i = 0; i < vectors.length; i++){
         temp = vectors[i];
         vectors[i].clearRegion();
-        vectors[i] = new Node(temp.x, temp.y, temp.r, 'white', 1);
+        vectors[i] = new Node(temp.x, temp.y, radius, temp.fill, 1);
         vectors[i].draw();
     }
 }
