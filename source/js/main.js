@@ -13,7 +13,7 @@ function main() {
     win_l = window.innerWidth;
     win_h = window.innerHeight;
     size = Math.min(win_h, win_l);
-    radius = size / 60;
+    radius = size / 70;
 
     ctx.canvas.width  = size;
     ctx.canvas.height = size;
@@ -44,7 +44,7 @@ function scrollEvent(ev){
     var y = ev.deltaY;
 
     if(vectors.length > 0){
-        if (y < 0 && radius >= (size / 60)) {
+        if (y < 0 && radius >= (size / 65)) {
             console.log("down");
             scroll = -2;   
         }
@@ -60,7 +60,7 @@ function scrollEvent(ev){
     for(var i = 0; i < vectors.length; i++){
         temp = vectors[i];
         vectors[i].clearRegion();
-        vectors[i] = new Node(temp.x, temp.y, radius, temp.fill, 1);
+        vectors[i] = new Node(temp.x, temp.y, radius, temp.fill, 1, i);
         vectors[i].draw();
     }
 }
@@ -84,7 +84,7 @@ function nodeEventHandler(coords, radius, removed, temp){
             }
 
             if(removed == false){
-                temp = new Node(coords.x, coords.y, radius, 'white', 1);
+                temp = new Node(coords.x, coords.y, radius, 'white', 1, vectors.length - 1);
                 if(!temp.isCollision(vectors)){
                     vectors.push(temp);
                 }
@@ -100,21 +100,21 @@ function nodeEventHandler(coords, radius, removed, temp){
     if(vectors.length > 0){
         temp = vectors[0];
         temp.clearRegion();
-        vectors[0] = new Node(temp.x, temp.y, temp.r, 'blue', 1);
+        vectors[0] = new Node(temp.x, temp.y, temp.r, 'blue', 1, 0);
         vectors[0].draw();
     }
 
     for(var i = 1; i < vectors.length - 1; i++){
         temp = vectors[i];
         vectors[i].clearRegion();
-        vectors[i] = new Node(temp.x, temp.y, temp.r, 'white', 1);
+        vectors[i] = new Node(temp.x, temp.y, temp.r, 'white', 1, i);
         vectors[i].draw();
     }
 
     if(vectors.length > 1){
         temp = vectors[vectors.length - 1];
         temp.clearRegion();
-        vectors[vectors.length - 1] = new Node(temp.x, temp.y, temp.r, 'red', 1);
+        vectors[vectors.length - 1] = new Node(temp.x, temp.y, temp.r, 'red', 1, vectors.length - 1);
         vectors[vectors.length - 1].draw();
     }
     
@@ -134,14 +134,15 @@ function Edge(head, tail){
     }
 }
 
-function Node(x, y, r, fill, stroke) {
+function Node(x, y, r, fill, stroke, index) {
     this.startingAngle = 0;
     this.endAngle = 2 * Math.PI;
     this.x = x;
     this.y = y;
     this.r = r;
-    this.region = r * 2.2;
-
+    this.region = (size / 60) * 2.2;
+    
+    this.index = index;
     this.fill = fill;
     this.stroke = stroke;
 
@@ -153,6 +154,12 @@ function Node(x, y, r, fill, stroke) {
         ctx.fill();
         ctx.strokeStyle = this.stroke;
         ctx.stroke();
+        if(r >= size / 60){
+            ctx.font = '8pt Calibri';
+            ctx.fillStyle = 'black';
+            ctx.textAlign = 'center';
+            ctx.fillText(index, this.x, this.y+3);
+        }
     }
 
     this.clearRegion = function() {
@@ -210,6 +217,7 @@ function relMouseCoords(event){
 
     return {x:canvasX, y:canvasY}
 }
+
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
 
 CanvasRenderingContext2D.prototype.clear = function(){
