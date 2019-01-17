@@ -32,7 +32,11 @@ function main() {
         if (ev.which === 1 && isEqual(mousePos, [ev.x , ev.y])) {
             ctxEvent();
         }
-        
+        else{
+            var h = getVectorByPosition(mousePos, vectors);
+            var t = getVectorByPosition([ev.x, ev.y], vectors);
+        }
+
         mousePos = [ev.x, ev.y];
     }, false);
 
@@ -241,6 +245,11 @@ function isEqual(a, b){
     }
 
     return result;
+}
+
+function getVectorByPosition(pos, vectors){
+
+    return;
 }
 
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
