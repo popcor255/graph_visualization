@@ -5,29 +5,41 @@ var win_h;
 var size;
 var radius;
 var vectors;
+var mousePos;
+
+var blue = "#5a8ded";
+var red = "#d61d45";
+var white = "#f3f7f3";
 
 function main() {
     htmlCanvas = document.getElementById("myCanvas");
     ctx = htmlCanvas.getContext('2d');
     vectors = [];
-    win_l = window.innerWidth;
-    win_h = window.innerHeight;
+    mousePos = [];
+    win_l = window.innerWidth * 0.96;
+    win_h = window.innerHeight * 0.96;
     size = Math.min(win_h, win_l);
     radius = size / 70;
-
     ctx.canvas.width  = size;
     ctx.canvas.height = size;
 
     htmlCanvas.addEventListener("mousedown",  function(ev) {
-        if (ev.which === 1) {
+        mousePos = [ev.x, ev.y];
+    }, false);
+
+
+    htmlCanvas.addEventListener("mouseup",  function(ev) {
+        if (ev.which === 1 && isEqual(mousePos, [ev.x , ev.y])) {
             ctxEvent();
         }
+        
+        mousePos = [ev.x, ev.y];
     }, false);
 
 
     htmlCanvas.addEventListener('wheel', function(ev) {
         scrollEvent(ev);
-    });
+    }, false);
 }
 
 function ctxEvent(){
@@ -84,7 +96,7 @@ function nodeEventHandler(coords, radius, removed, temp){
             }
 
             if(removed == false){
-                temp = new Node(coords.x, coords.y, radius, 'white', 1, vectors.length - 1);
+                temp = new Node(coords.x, coords.y, radius, white, 1, vectors.length - 1);
                 if(!temp.isCollision(vectors)){
                     vectors.push(temp);
                 }
@@ -100,21 +112,21 @@ function nodeEventHandler(coords, radius, removed, temp){
     if(vectors.length > 0){
         temp = vectors[0];
         temp.clearRegion();
-        vectors[0] = new Node(temp.x, temp.y, temp.r, 'blue', 1, 0);
+        vectors[0] = new Node(temp.x, temp.y, temp.r, blue, 1, 0);
         vectors[0].draw();
     }
 
     for(var i = 1; i < vectors.length - 1; i++){
         temp = vectors[i];
         vectors[i].clearRegion();
-        vectors[i] = new Node(temp.x, temp.y, temp.r, 'white', 1, i);
+        vectors[i] = new Node(temp.x, temp.y, temp.r, white, 1, i);
         vectors[i].draw();
     }
 
     if(vectors.length > 1){
         temp = vectors[vectors.length - 1];
         temp.clearRegion();
-        vectors[vectors.length - 1] = new Node(temp.x, temp.y, temp.r, 'red', 1, vectors.length - 1);
+        vectors[vectors.length - 1] = new Node(temp.x, temp.y, temp.r, red, 1, vectors.length - 1);
         vectors[vectors.length - 1].draw();
     }
     
@@ -216,6 +228,19 @@ function relMouseCoords(event){
     canvasY = event.pageY - totalOffsetY;
 
     return {x:canvasX, y:canvasY}
+}
+
+function isEqual(a, b){
+    var size = Math.min(a.length, b.length);
+    var result = true;
+
+    for(var i = 0; i < size; i++){
+        if(a[i] != b[i]){
+            result = false;
+        }
+    }
+
+    return result;
 }
 
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
