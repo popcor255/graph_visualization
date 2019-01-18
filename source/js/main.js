@@ -6,6 +6,7 @@ var size;
 var radius;
 var vectors;
 var mousePos;
+var coords;
 
 var blue = "#5a8ded";
 var red = "#d61d45";
@@ -23,21 +24,44 @@ function main() {
     ctx.canvas.width  = size;
     ctx.canvas.height = size;
 
-    htmlCanvas.addEventListener("mousedown",  function(ev) {
+/*
+    document.addEventListener("drop",  function(ev) {
+        console.log("dragStopped");
         mousePos = [ev.x, ev.y];
     }, false);
 
 
+    document.addEventListener("dragstart",  function(ev) {
+        
+    }, false);
+*/
+
+    htmlCanvas.addEventListener("mousedown",  function(ev) {
+        coords = htmlCanvas.relMouseCoords(event);
+        mousePos = [coords.x, coords.y];
+    }, false);
+
+
     htmlCanvas.addEventListener("mouseup",  function(ev) {
-        if (ev.which === 1 && isEqual(mousePos, [ev.x , ev.y])) {
+        coords = htmlCanvas.relMouseCoords(event);
+
+        if (ev.which === 1 && isClose(mousePos, [coords.x , coords.y], (radius))) {
             ctxEvent();
         }
-        else{
-            var h = getVectorByPosition(mousePos, vectors);
-            var t = getVectorByPosition([ev.x, ev.y], vectors);
+        else if(ev.which == 1){
+            var h = getVectorByPosition(mousePos, vectors, null);
+            var t = getVectorByPosition([coords.x, coords.y], vectors, h);
+            if(h != null && t != null){
+                console.log(h.index + ":" + t.index);
+            }
+            else{
+                console.log(h + ":" + t);
+            }
+            
+            mousePos = [coords.x, coords.y];
         }
 
-        mousePos = [ev.x, ev.y];
+        mousePos = [coords.x, coords.y];
     }, false);
 
 
@@ -47,9 +71,10 @@ function main() {
 }
 
 function ctxEvent(){
-    var coords = htmlCanvas.relMouseCoords(event);
     var removed = false;
     var temp = null;
+    coords = htmlCanvas.relMouseCoords(event);
+
 
     nodeEventHandler(coords, radius, removed, temp);
     
@@ -171,7 +196,7 @@ function Node(x, y, r, fill, stroke, index) {
         ctx.strokeStyle = this.stroke;
         ctx.stroke();
         if(r >= size / 60){
-            ctx.font = '8pt Calibri';
+            ctx.font = '12pt Gill Sans';
             ctx.fillStyle = 'black';
             ctx.textAlign = 'center';
             ctx.fillText(index, this.x, this.y+3);
@@ -234,12 +259,15 @@ function relMouseCoords(event){
     return {x:canvasX, y:canvasY}
 }
 
-function isEqual(a, b){
+function isClose(a, b, factor){
     var size = Math.min(a.length, b.length);
     var result = true;
+    var diff = 0; 
 
     for(var i = 0; i < size; i++){
-        if(a[i] != b[i]){
+        diff = Math.abs(a[i] - b[i]);
+        
+        if(diff > factor){
             result = false;
         }
     }
@@ -247,9 +275,19 @@ function isEqual(a, b){
     return result;
 }
 
-function getVectorByPosition(pos, vectors){
+function getVectorByPosition(pos, v, omit){
+    var r = null;
 
-    return;
+    for(var i = 0; i < v.length; i++){
+        if(v[i].isClicked(pos[0], pos[1])){
+            if(v[i] != omit){
+                r = v[i];
+                break;
+            }
+        }
+    }
+
+    return r;
 }
 
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
