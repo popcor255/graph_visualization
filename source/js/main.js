@@ -24,18 +24,6 @@ function main() {
     ctx.canvas.width  = size;
     ctx.canvas.height = size;
 
-/*
-    document.addEventListener("drop",  function(ev) {
-        console.log("dragStopped");
-        mousePos = [ev.x, ev.y];
-    }, false);
-
-
-    document.addEventListener("dragstart",  function(ev) {
-        
-    }, false);
-*/
-
     htmlCanvas.addEventListener("mousedown",  function(ev) {
         coords = htmlCanvas.relMouseCoords(event);
         mousePos = [coords.x, coords.y];
@@ -51,6 +39,7 @@ function main() {
         else if(ev.which == 1){
             var h = getVectorByPosition(mousePos, vectors, null);
             var t = getVectorByPosition([coords.x, coords.y], vectors, h);
+
             if(h != null && t != null){
                 console.log(h.index + ":" + t.index);
             }
