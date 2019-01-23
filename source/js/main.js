@@ -5,6 +5,7 @@ var win_h;
 var size;
 var radius;
 var vectors;
+var edges;
 var mousePos;
 var coords;
 
@@ -16,6 +17,7 @@ function main() {
     htmlCanvas = document.getElementById("myCanvas");
     ctx = htmlCanvas.getContext('2d');
     vectors = [];
+    edges = [];
     mousePos = [];
     win_l = window.innerWidth * 0.96;
     win_h = window.innerHeight * 0.96;
@@ -31,24 +33,26 @@ function main() {
 
 
     htmlCanvas.addEventListener("mouseup",  function(ev) {
+        ctx.clear();
         coords = htmlCanvas.relMouseCoords(event);
 
         if (ev.which === 1 && isClose(mousePos, [coords.x , coords.y], (radius))) {
-            ctxEvent();
+            var removed = false;
+            var temp = null;
+
+            nodeEventHandler(coords, radius, removed, temp);
         }
         else if(ev.which == 1){
             var h = getVectorByPosition(mousePos, vectors, null);
             var t = getVectorByPosition([coords.x, coords.y], vectors, h);
 
             if(h != null && t != null){
-                console.log(h.index + ":" + t.index);
-            }
-            else{
-                console.log(h + ":" + t);
-            }
-            
-            mousePos = [coords.x, coords.y];
+                edges.push(new Edge(h, t));
+            }    
         }
+
+        drawEdges();
+        drawNodes();
 
         mousePos = [coords.x, coords.y];
     }, false);
@@ -57,16 +61,6 @@ function main() {
     htmlCanvas.addEventListener('wheel', function(ev) {
         scrollEvent(ev);
     }, false);
-}
-
-function ctxEvent(){
-    var removed = false;
-    var temp = null;
-    coords = htmlCanvas.relMouseCoords(event);
-
-
-    nodeEventHandler(coords, radius, removed, temp);
-    
 }
 
 function scrollEvent(ev){
@@ -122,6 +116,33 @@ function nodeEventHandler(coords, radius, removed, temp){
         }
     }
 
+    return;
+    
+}
+
+function drawEdges(){
+    var isFound = true;
+    for(var i = 0; i < edges.length; i++){
+        isFound = false;
+        console.log(doesExist(vectors, [edges[i].head, edges[i].tail]));
+        if(doesExist(vectors, [edges[i].head, edges[i].tail])){
+            isFound = true;
+        }
+
+        if(isFound){
+            edges[i].draw();
+        }
+        else{
+            removeEdges(edges[i].head.index);
+            removeEdges(edges[i].tail.index);
+        }
+    }
+    
+    return;
+}
+
+function drawNodes(){
+    
     //redraw nodes as follows
     //if the head your blue
     //if the tail your red
@@ -147,21 +168,35 @@ function nodeEventHandler(coords, radius, removed, temp){
         vectors[vectors.length - 1] = new Node(temp.x, temp.y, temp.r, red, 1, vectors.length - 1);
         vectors[vectors.length - 1].draw();
     }
-    
+
+    return;
+}
+
+function removeEdges(e){
+    for(var i = 0; i < edges.length; i++){
+        if(edges[i].head.index == e || edges[i].tail.index == e){
+            edges.splice(i, 1);
+        }
+    }
 }
 
 function Edge(head, tail){
     this.head = head;
     this.tail = tail;
+    this.drawn = false;
 
     this.draw = function(){
         ctx.beginPath();
         ctx.globalCompositeOperation = 'destination-over';
         ctx.moveTo(head.x, head.y);
         ctx.lineTo(tail.x, tail.y);
+        ctx.strokeStyle = white;
         ctx.stroke();
         ctx.globalCompositeOperation = 'source-over';
+        this.drawn = true;
     }
+
+    this.draw();
 }
 
 function Node(x, y, r, fill, stroke, index) {
@@ -170,17 +205,20 @@ function Node(x, y, r, fill, stroke, index) {
     this.x = x;
     this.y = y;
     this.r = r;
-    this.region = (size / 60) * 2.2;
+    this.lineWidth = 4;
+    this.region = ((size / 60) * 2.2) + this.lineWidth;
     
     this.index = index;
     this.fill = fill;
     this.stroke = stroke;
+    ctx.strokeStyle = white;
+
 
     this.draw = function () {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.r, this.startingAngle, this.endAngle);
         ctx.fillStyle = this.fill;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = this.lineWidth - 1;
         ctx.fill();
         ctx.strokeStyle = this.stroke;
         ctx.stroke();
@@ -279,9 +317,31 @@ function getVectorByPosition(pos, v, omit){
     return r;
 }
 
+function doesExist(v, a){
+    var isHead = false;
+    var isTail = false;
+
+    for(var i = 0; i < v.length; i++){
+
+        if(a[0].index == v[i].index){
+            isHead = true;
+        }
+
+        if(a[1].index == v[i].index){
+            isTail = true;
+        }
+
+        if(isHead == true && isTail == true){
+            return true;
+        }
+        
+    }
+
+    return false;
+}
+
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
 
 CanvasRenderingContext2D.prototype.clear = function(){
     ctx.clearRect(0,0,size,size);
-    vectors = [];
 }
