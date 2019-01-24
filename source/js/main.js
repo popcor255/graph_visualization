@@ -51,8 +51,8 @@ function main() {
             }    
         }
 
-        drawEdges();
         drawNodes();
+        drawEdges();
 
         mousePos = [coords.x, coords.y];
     }, false);
@@ -98,10 +98,12 @@ function nodeEventHandler(coords, radius, removed, temp){
 
     if(coords.x > radius && coords.x < size - radius){
         if(coords.y > radius && coords.y < size - radius){
+            
             for(var i = 0; i < vectors.length; i++){
                 temp = vectors[i];
                 if(temp != null && temp.isClicked(coords.x, coords.y)){
                     temp.clearRegion();
+                    removeEdges(vectors[i]);
                     vectors.splice(i, 1);
                     removed = true;
                 }
@@ -121,24 +123,28 @@ function nodeEventHandler(coords, radius, removed, temp){
 }
 
 function drawEdges(){
-    var isFound = true;
     for(var i = 0; i < edges.length; i++){
-        isFound = false;
-        console.log(doesExist(vectors, [edges[i].head, edges[i].tail]));
-        if(doesExist(vectors, [edges[i].head, edges[i].tail])){
-            isFound = true;
-        }
+        edges[i].draw();
+    }    
+}
 
-        if(isFound){
-            edges[i].draw();
+function removeEdges(v){
+    var head = null;
+    var tail = null;
+    var i = edges.length - 1;
+    while(i >= 0){
+        head = edges[i].head.index;
+        tail = edges[i].tail.index;
+        if(head == v.index || tail == v.index){
+            edges.splice(i, 1);
         }
         else{
-            removeEdges(edges[i].head.index);
-            removeEdges(edges[i].tail.index);
+            console.log("sa");
         }
+        
+        i--;
+        
     }
-    
-    return;
 }
 
 function drawNodes(){
@@ -172,14 +178,6 @@ function drawNodes(){
     return;
 }
 
-function removeEdges(e){
-    for(var i = 0; i < edges.length; i++){
-        if(edges[i].head.index == e || edges[i].tail.index == e){
-            edges.splice(i, 1);
-        }
-    }
-}
-
 function Edge(head, tail){
     this.head = head;
     this.tail = tail;
@@ -200,6 +198,7 @@ function Edge(head, tail){
 }
 
 function Node(x, y, r, fill, stroke, index) {
+    this.id = null; //implement an unique id to replace index to remove node error
     this.startingAngle = 0;
     this.endAngle = 2 * Math.PI;
     this.x = x;
@@ -315,29 +314,6 @@ function getVectorByPosition(pos, v, omit){
     }
 
     return r;
-}
-
-function doesExist(v, a){
-    var isHead = false;
-    var isTail = false;
-
-    for(var i = 0; i < v.length; i++){
-
-        if(a[0].index == v[i].index){
-            isHead = true;
-        }
-
-        if(a[1].index == v[i].index){
-            isTail = true;
-        }
-
-        if(isHead == true && isTail == true){
-            return true;
-        }
-        
-    }
-
-    return false;
 }
 
 HTMLCanvasElement.prototype.relMouseCoords = relMouseCoords;
